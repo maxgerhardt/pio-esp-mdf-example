@@ -1,0 +1,36 @@
+menu "MDF Mespnow"
+
+    config MESPNOW_RETRANSMIT_NUM
+        int "Number of data retransmissions"
+        default 3
+        help
+            Number of data retransmissions
+
+    config MESPNOW_DEFAULT_PMK
+        string "primary master key is used to encrypt local master key"
+        default "pmk1234567890123"
+        help
+            primary master key is used to encrypt local master key
+
+    config MESPNOW_LOG_LEVEL
+        int "Mespnow logging level"
+        default 2
+        help
+            Config mespnow logging level (0-5).
+
+menu "Mespnow queue size"
+    config MESPNOW_TRANS_PIPE_DEBUG_QUEUE_SIZE
+        int "Mespnow debug pipe queue size"
+        default 5
+    config MESPNOW_TRANS_PIPE_CONTROL_QUEUE_SIZE
+        int "Mespnow control pipe queue size"
+        default 5
+    config MESPNOW_TRANS_PIPE_MCONFIG_QUEUE_SIZE
+        int "Mespnow mconfig pipe queue size"
+        default 10
+    config MESPNOW_TRANS_PIPE_RESERVED_QUEUE_SIZE
+        int "Mespnow reserved pipe queue size"
+        default 5
+endmenu
+
+endmenu
