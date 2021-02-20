@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <Arduino.h>
+#include <esp_wifi.h>
 #include "mdf_common.h"
 #include "mwifi.h"
 
@@ -122,7 +124,7 @@ static void print_system_info_timercb(void *timer)
     uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
     wifi_sta_list_t wifi_sta_list   = {0x0};
 
-    esp_wifi_get_mac(ESP_IF_WIFI_STA, sta_mac);
+    esp_wifi_get_mac(/*ESP_IF_WIFI_STA*/ WIFI_IF_STA, sta_mac);
     esp_wifi_ap_get_sta_list(&wifi_sta_list);
     esp_wifi_get_channel(&primary, &second);
     esp_mesh_get_parent_bssid(&parent_bssid);
@@ -160,6 +162,7 @@ static mdf_err_t wifi_init()
 
     MDF_ERROR_ASSERT(ret);
 
+    //tcpip_adapter_init();
     MDF_ERROR_ASSERT(esp_netif_init());
     MDF_ERROR_ASSERT(esp_event_loop_create_default());
     MDF_ERROR_ASSERT(esp_wifi_init(&cfg));
@@ -204,14 +207,14 @@ static mdf_err_t event_loop_cb(mdf_event_loop_t event, void *ctx)
     return MDF_OK;
 }
 
-void app_main()
+
+void example_main_function()
 {
     mwifi_init_config_t cfg = MWIFI_INIT_CONFIG_DEFAULT();
-    mwifi_config_t config   = {
-        .channel   = CONFIG_MESH_CHANNEL,
-        .mesh_id   = CONFIG_MESH_ID,
-        .mesh_type = CONFIG_DEVICE_TYPE,
-    };
+    mwifi_config_t config {};
+    config.channel   = CONFIG_MESH_CHANNEL;
+    strcpy(config.mesh_id, CONFIG_MESH_ID);
+    config.mesh_type = CONFIG_DEVICE_TYPE;
 
     /**
      * @brief Set the log level for serial port printing.
@@ -244,4 +247,13 @@ void app_main()
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_RATE_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
+}
+
+void setup() {
+    Serial.begin(115200);
+    example_main_function();
+}
+void loop() {
+    /* nothing, all is done in tasks */
+    delay(1000);
 }

@@ -1,0 +1,22 @@
+{
+  "name": "mwifi",
+  "keywords": "esp-mdf",
+  "description": "The mwifi component of ESP-MDF",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxgerhardt/tobefilled.git"
+  },
+  "version": "1.0",
+  "authors": {
+    "name": "ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD",
+    "url": "https://github.com/espressif/esp-mdf"
+  },
+  "licence": "MIT",
+  "frameworks": ["espidf", "arduino"],
+  "platforms": "espressif32",
+  "build" : {
+    "flags": [
+      "-I include"
+    ]
+  }
+}
