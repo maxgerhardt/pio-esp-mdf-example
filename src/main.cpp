@@ -24,7 +24,7 @@ static const char *TAG = "get_started";
 static void root_task(void *arg)
 {
     mdf_err_t ret                    = MDF_OK;
-    char *data                       = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    char *data                       = (char*) MDF_MALLOC(MWIFI_PAYLOAD_LEN);
     size_t size                      = MWIFI_PAYLOAD_LEN;
     uint8_t src_addr[MWIFI_ADDR_LEN] = {0x0};
     mwifi_data_type_t data_type      = {0};
@@ -58,7 +58,7 @@ static void root_task(void *arg)
 static void node_read_task(void *arg)
 {
     mdf_err_t ret = MDF_OK;
-    char *data    = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    char *data    = (char*) MDF_MALLOC(MWIFI_PAYLOAD_LEN);
     size_t size   = MWIFI_PAYLOAD_LEN;
     mwifi_data_type_t data_type      = {0x0};
     uint8_t src_addr[MWIFI_ADDR_LEN] = {0x0};
@@ -89,7 +89,7 @@ void node_write_task(void *arg)
     mdf_err_t ret = MDF_OK;
     int count     = 0;
     size_t size   = 0;
-    char *data    = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    char *data    = (char*) MDF_MALLOC(MWIFI_PAYLOAD_LEN);
     mwifi_data_type_t data_type = {0x0};
 
     MDF_LOGI("Node write task is running");
@@ -119,7 +119,7 @@ void node_write_task(void *arg)
 static void print_system_info_timercb(void *timer)
 {
     uint8_t primary                 = 0;
-    wifi_second_chan_t second       = 0;
+    wifi_second_chan_t second       = WIFI_SECOND_CHAN_NONE;
     mesh_addr_t parent_bssid        = {0};
     uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
     wifi_sta_list_t wifi_sta_list   = {0x0};
@@ -213,7 +213,7 @@ void example_main_function()
     mwifi_init_config_t cfg = MWIFI_INIT_CONFIG_DEFAULT();
     mwifi_config_t config {};
     config.channel   = CONFIG_MESH_CHANNEL;
-    strcpy(config.mesh_id, CONFIG_MESH_ID);
+    strcpy((char*)config.mesh_id, CONFIG_MESH_ID);
     config.mesh_type = CONFIG_DEVICE_TYPE;
 
     /**
