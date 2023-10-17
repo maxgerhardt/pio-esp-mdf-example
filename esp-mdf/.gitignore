@@ -1,0 +1,76 @@
+.config
+*.o
+*.pyc
+
+# gtags
+GTAGS
+GRTAGS
+GPATH
+
+# emacs
+.dir-locals.el
+
+# emacs temp file suffixes
+*~
+.#*
+\#*#
+
+# eclipse setting
+.settings
+
+# sublime
+.tags
+.tags_sorted_by_file
+*.sublime-project
+*.sublime-workspace
+
+# vscode
+.vscode/
+
+# Doc build artifacts
+docs/*/_build/
+docs/*/doxygen-warning-log.txt
+docs/*/sphinx-warning-log.txt
+docs/*/sphinx-warning-log-sanitized.txt
+docs/*/xml/
+docs/*/xml_in/
+docs/*/man/
+docs/doxygen_sqlite3.db
+
+# Application project files
+examples/*/sdkconfig
+examples/*/sdkconfig.old
+examples/*/build/
+examples/*/serial_log/
+examples/*/bin/
+
+examples/*/*.sh
+
+examples/*/*/sdkconfig
+examples/*/*/sdkconfig.old
+examples/*/*/build/
+examples/*/*/serial_log/
+examples/*/*/bin/
+examples/*/*/*.sh
+
+examples/*/*/*/sdkconfig
+examples/*/*/*/sdkconfig.old
+examples/*/*/*/build/
+examples/*/*/*/serial_log/
+examples/*/*/*/bin/
+examples/*/*/*/*.sh
+
+examples/test
+
+*.DS_Store
+*/*.DS_Store
+*/*/*.DS_Store
+*/*/*/*.DS_Store
+
+# vscode settings
+.vscode
+
+# clangd cache
+.clangd
+.cache
+

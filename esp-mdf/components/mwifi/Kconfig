@@ -1,0 +1,290 @@
+menu "MDF Mwifi"
+
+    menu "Root config"
+
+        config MWIFI_VOTE_PERCENTAGE
+            int "Vote percentage threshold above which the node becoms a root"
+            range 1 100
+            default 90
+            help
+                Vote percentage threshold above which the node becoms a root
+
+        config MWIFI_VOTE_MAX_COUNT
+            int "Max vote counts in self-healing"
+            range 1 100
+            default 15
+            help
+                Max multiple voting each device can have for the self-healing of a mesh network
+
+        config MWIFI_BACKOFF_RSSI
+            int "RSSI threshold for connecting to the root"
+            range -90 0
+            default -78
+            help
+                RSSI threshold below which connections to the root node are not allowed
+
+        config MWIFI_SCAN_MINI_COUNT
+            int "Minimum scan times before being a root"
+            default 10
+            help
+                Minimum scan times before being a root
+
+        config MWIFI_ROOT_HEALING_MS
+            int "Delay time before starting root healing"
+            default 6000
+            help
+                Time lag between the moment a root node is disconnected from the network and the moment
+                the devices start electing another root node
+
+        config MWIFI_ROOT_CONFLICTS_ENABLE
+            bool "Allow more than one root in one network"
+            default n
+            help
+                Allow more than one root in one network
+
+    endmenu
+
+    menu "Capacity config"
+
+        config MWIFI_CAPACITY_NUM
+            int "Mesh network capacity"
+            range 1 512
+            default 512
+            help
+                Network capacity, defining max number of devices allowed in the mesh network.
+        
+        choice
+            bool "Mesh Topology"
+            default MESH_TOPO_TREE
+            help 
+                Mesh Network Topology
+            config MESH_TOPO_TREE
+                bool "MESH_TOPO_TREE"
+            config MESH_TOPO_CHAIN
+                bool "MESH_TOPO_CHAIN"
+        endchoice
+        
+        config MWIFI_TOPOLOGY
+            int
+            default 0 if MESH_TOPO_TREE
+            default 1 if MESH_TOPO_CHAIN
+            help 
+                Mesh Network Topology
+
+        config MWIFI_MAX_LAYER
+            int "Max number of allowed layers"
+            range 1 25 if MESH_TOPO_TREE
+            range 1 1000 if MESH_TOPO_CHAIN
+            default 16
+            help
+                Max layer allowed in mesh network
+
+        config MWIFI_MAX_CONNECTION
+            int "Max number of mesh softAP connections"
+            range 1 10
+            default 6
+            help
+                Max number of mesh softAP connections
+
+    endmenu
+
+    menu "Stability config"
+
+        config MWIFI_ASSOC_EXPIRE_MS
+            int "Mesh softAP associate expired time"
+            default 30000
+            range 10000 60000
+            help
+                Period of time after which a mesh softAP breaks its association with inactive leaf nodes
+
+        config MWIFI_BEACON_INTERVAL_MS
+            int "Mesh softAP beacon interval"
+            default 100
+            help
+                Mesh softAP beacon interval
+
+        config MWIFI_PASSIVE_SCAN_MS
+            int "Mesh station passive scan duration"
+            default 300
+            help
+                Mesh station passive scan duration
+
+        config MWIFI_MONITOR_DURATION_MS
+            int "Parent weak RSSI monitor duration"
+            default 60000
+            range 1000 60000
+            help
+                Period (ms) for monitoring the parent's RSSI. If the signal stays weak throughout
+                the period, the node will find another parent offering more stable connection
+
+        config MWIFI_CNX_RSSI
+            int "RSSI threshold above which the connection with a parent is considered strong"
+            range -120 0
+            default -120
+            help
+                RSSI threshold above which the connection with a parent is considered strong
+
+        config MWIFI_SELECT_RSSI
+            int "RSSI threshold for parent selection"
+            range -120 0
+            default -78
+            help
+                RSSI threshold for parent selection. Its value should be greater than switch_rssi
+
+        config MWIFI_SWITCH_RSSI
+            int "RSSI threshold below which a node selects a parent with better RSSI"
+            range -120 0
+            default -78
+            help
+                RSSI threshold below which a node selects a parent with better RSSI
+
+        config MWIFI_ATTEMPT_COUNT
+            int "The number of retries when the parent node disconnects"
+            default 60
+            help
+                Max fails for a parent node to restore connection to the mesh network
+                before it breaks the connection with its leaf nodes
+
+        config MWIFI_MONITOR_IE_COUNT
+            int "Acceptable times of parent ie change before update self ie"
+            default 10
+            help
+                Allowed number of changes a parent node can introduce into its information element (IE),
+                before the leaf nodes must update their own IEs accordingly
+
+        config MWIFI_WAIVE_ROOT
+            bool "Reselect the root when the RSSI is weak"
+            default y
+            help
+                Cause the root device to give up (waive) its mesh root status,
+                A device is elected root primarily based on RSSI from the external router
+
+        config MWIFI_WAIVE_ROOT_RSSI
+            int "Reselect the RSSI threshold of the root node"
+            range -120 0
+            default -70
+            depends on MWIFI_WAIVE_ROOT
+            help
+                When the RSSI between the root and the router is lower than this value,
+                the reselection root is triggered.
+
+        config MWIFI_RSSI_THRESHOUD_HIGH
+            int "high level of the rssi_threshoud for three level"
+            range -85 -55
+            default -78
+
+        config MWIFI_RSSI_THRESHOUD_MEDIUM
+            int "medium level of the rssi_threshoud for three level"
+            range -85 -55
+            default -82
+
+        config MWIFI_RSSI_THRESHOUD_LOW
+            int "low level of the rssi_threshoud for three level"
+            range -85 -55
+            default -85
+
+    endmenu
+
+    menu "Transmission config"
+
+        config MWIFI_XON_QSIZE
+            int "The number of mesh buffer queues"
+            default 32
+            help
+                The number of mesh buffer queues.
+
+        config MWIFI_RETRANSMIT_ENABLE
+            bool "If retransmission on mesh stack"
+            default y
+            help
+                Enable a source node to retransmit data to the node from which it failed to receive ACK
+
+        config MWIFI_DATA_DROP_ENABLE
+            bool "Discard packets when the root changes"
+            default y
+            help
+                If a root is changed, enable the new root to drop the previous packet
+
+        config MWIFI_MESH_IE_ENABLE
+            bool "Enable mesh IE encryption"
+            default y
+            help
+                If you use wifi receiver to get 802.11 packet analysis,
+                you need to disable mesh IE encryption. mesh IE encryption is not compatible with unencrypted versions.
+
+    endmenu
+
+    menu "Power save config"
+        config MWIFI_ENABLE_PS
+            bool "Enable mesh PS (power save) function"
+            default n
+            help
+                Enable/Disable Power Save function.
+
+        choice
+            bool "Mesh PS device duty cycle type"
+            depends on MWIFI_ENABLE_PS
+            default MWIFI_PS_DEV_DUTY_TYPE_REQUEST
+            help
+                Mesh PS device duty cycle type.
+
+            config MWIFI_PS_DEV_DUTY_TYPE_REQUEST
+                bool "MWIFI_PS_DEV_DUTY_TYPE_REQUEST"
+            config MWIFI_PS_DEV_DUTY_TYPE_DEMAND
+                bool "MWIFI_PS_DEV_DUTY_TYPE_DEMAND"
+        endchoice
+
+        config MWIFI_PS_DEV_DUTY_TYPE
+            int
+            depends on MWIFI_ENABLE_PS
+            default 1 if MWIFI_PS_DEV_DUTY_TYPE_REQUEST
+            default 4 if MWIFI_PS_DEV_DUTY_TYPE_DEMAND
+            help
+                Mesh PS device duty cycle type.
+
+        config MWIFI_PS_DEV_DUTY
+            int "Mesh PS device duty cycle"
+            depends on MWIFI_ENABLE_PS
+            range 1 100
+            default 10
+            help
+                Mesh PS device duty cycle.
+
+        config MWIFI_PS_NWK_DUTY
+            int "Mesh PS network duty cycle"
+            depends on MWIFI_ENABLE_PS
+            range 1 100
+            default 10
+            help
+                Mesh PS network duty cycle.
+
+        config MWIFI_PS_NWK_DUTY_DURATION
+            int "Mesh PS network duty cycle duration (unit: minutes)"
+            depends on MWIFI_ENABLE_PS
+            range -1 100
+            default -1
+            help
+                Mesh PS network duty cycle duration.
+
+        choice
+            bool "Mesh PS network duty cycle rule"
+            depends on MWIFI_ENABLE_PS
+            default MWIFI_PS_NETWORK_DUTY_APPLIED_ENTIRE
+            help
+                Mesh PS network duty cycle rule.
+
+            config MWIFI_PS_NETWORK_DUTY_APPLIED_ENTIRE
+                bool "MWIFI_PS_NETWORK_DUTY_APPLIED_ENTIRE"
+            config MWIFI_PS_NETWORK_DUTY_APPLIED_UPLINK
+                bool "MWIFI_PS_NETWORK_DUTY_APPLIED_UPLINK"
+        endchoice
+
+        config MWIFI_PS_NWK_DUTY_RULE
+            int
+            depends on MWIFI_ENABLE_PS
+            default 0 if MWIFI_PS_NETWORK_DUTY_APPLIED_ENTIRE
+            default 1 if MWIFI_PS_NETWORK_DUTY_APPLIED_UPLINK
+            help
+                Mesh PS network duty cycle rule.
+    endmenu
+endmenu
