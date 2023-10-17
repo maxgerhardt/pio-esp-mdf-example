@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <Arduino.h>
+#include <esp_wifi.h>
 #include "mdf_common.h"
 #include "mwifi.h"
 
@@ -22,10 +24,10 @@ static const char *TAG = "get_started";
 static void root_task(void *arg)
 {
     mdf_err_t ret                    = MDF_OK;
-    char *data                       = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    char *data                       = (char*) MDF_MALLOC(MWIFI_PAYLOAD_LEN);
     size_t size                      = MWIFI_PAYLOAD_LEN;
-    uint8_t src_addr[MWIFI_ADDR_LEN] = {0x0};
-    mwifi_data_type_t data_type      = {0};
+    uint8_t src_addr[MWIFI_ADDR_LEN] = {};
+    mwifi_data_type_t data_type      = {};
 
     MDF_LOGI("Root is running");
 
@@ -56,9 +58,9 @@ static void root_task(void *arg)
 static void node_read_task(void *arg)
 {
     mdf_err_t ret = MDF_OK;
-    char *data    = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    char *data    = (char*) MDF_MALLOC(MWIFI_PAYLOAD_LEN);
     size_t size   = MWIFI_PAYLOAD_LEN;
-    mwifi_data_type_t data_type      = {0x0};
+    mwifi_data_type_t data_type      = {};
     uint8_t src_addr[MWIFI_ADDR_LEN] = {0x0};
 
     MDF_LOGI("Note read task is running");
@@ -87,8 +89,8 @@ void node_write_task(void *arg)
     mdf_err_t ret = MDF_OK;
     int count     = 0;
     size_t size   = 0;
-    char *data    = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
-    mwifi_data_type_t data_type = {0x0};
+    char *data    = (char*) MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    mwifi_data_type_t data_type = {};
 
     MDF_LOGI("Node write task is running");
 
@@ -117,12 +119,12 @@ void node_write_task(void *arg)
 static void print_system_info_timercb(void *timer)
 {
     uint8_t primary                 = 0;
-    wifi_second_chan_t second       = 0;
+    wifi_second_chan_t second       = WIFI_SECOND_CHAN_NONE;
     mesh_addr_t parent_bssid        = {0};
     uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
-    wifi_sta_list_t wifi_sta_list   = {0x0};
+    wifi_sta_list_t wifi_sta_list   = {};
 
-    esp_wifi_get_mac(ESP_IF_WIFI_STA, sta_mac);
+    esp_wifi_get_mac(/*ESP_IF_WIFI_STA*/ WIFI_IF_STA, sta_mac);
     esp_wifi_ap_get_sta_list(&wifi_sta_list);
     esp_wifi_get_channel(&primary, &second);
     esp_mesh_get_parent_bssid(&parent_bssid);
@@ -160,6 +162,7 @@ static mdf_err_t wifi_init()
 
     MDF_ERROR_ASSERT(ret);
 
+    //tcpip_adapter_init();
     MDF_ERROR_ASSERT(esp_netif_init());
     MDF_ERROR_ASSERT(esp_event_loop_create_default());
     MDF_ERROR_ASSERT(esp_wifi_init(&cfg));
@@ -204,14 +207,13 @@ static mdf_err_t event_loop_cb(mdf_event_loop_t event, void *ctx)
     return MDF_OK;
 }
 
-void app_main()
+void example_main_function()
 {
     mwifi_init_config_t cfg = MWIFI_INIT_CONFIG_DEFAULT();
-    mwifi_config_t config   = {
-        .channel   = CONFIG_MESH_CHANNEL,
-        .mesh_id   = CONFIG_MESH_ID,
-        .mesh_type = CONFIG_DEVICE_TYPE,
-    };
+    mwifi_config_t config {};
+    config.channel   = CONFIG_MESH_CHANNEL;
+    memcpy((char*)config.mesh_id, CONFIG_MESH_ID, sizeof(CONFIG_MESH_ID) - 1);
+    config.mesh_type = CONFIG_DEVICE_TYPE;
 
     /**
      * @brief Set the log level for serial port printing.
@@ -244,4 +246,13 @@ void app_main()
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_RATE_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
+}
+
+void setup() {
+    Serial.begin(115200);
+    example_main_function();
+}
+void loop() {
+    /* nothing, all is done in tasks */
+    delay(1000);
 }
