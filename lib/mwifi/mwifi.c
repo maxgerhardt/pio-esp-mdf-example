@@ -63,8 +63,9 @@ bool mwifi_get_root_status()
 {
     if (!g_toDs_status_flag) {
         mesh_assoc_t mesh_assoc = {0x0};
+        mesh_chain_layer_t mesh_chain;
 
-        if (esp_wifi_vnd_mesh_get(&mesh_assoc) == MDF_OK) {
+        if (esp_wifi_vnd_mesh_get(&mesh_assoc, &mesh_chain) == MDF_OK) {
             g_toDs_status_flag = mesh_assoc.toDS;
         }
     }
@@ -482,6 +483,18 @@ mdf_err_t mwifi_start()
      */
     ESP_ERROR_CHECK(esp_mesh_set_xon_qsize(init_config->xon_qsize));
 
+#ifdef CONFIG_MWIFI_ENABLE_PS
+    /* Enable mesh PS function */
+    ESP_ERROR_CHECK(esp_mesh_enable_ps());
+    /* better to increase the associate expired time, if a small duty cycle is set. */
+    ESP_ERROR_CHECK(esp_mesh_set_ap_assoc_expire(60));
+    /* better to increase the announce interval to avoid too much management traffic, if a small duty cycle is set. */
+    ESP_ERROR_CHECK(esp_mesh_set_announce_interval(600, 3300));
+#else
+    /* Disable mesh PS function */
+    ESP_ERROR_CHECK(esp_mesh_disable_ps());
+#endif
+
     /**
      * @brief mwifi AP configuration
      *  - Set mesh softAP authentication mode
@@ -504,7 +517,7 @@ mdf_err_t mwifi_start()
 
     if (strlen(ap_config->mesh_password)) {
         memcpy(mesh_config.mesh_ap.password, ap_config->mesh_password, sizeof(mesh_config.mesh_ap.password));
-        ESP_ERROR_CHECK(esp_mesh_set_ap_authmode(WIFI_AUTH_WPA_WPA2_PSK));
+        ESP_ERROR_CHECK(esp_mesh_set_ap_authmode(WIFI_AUTH_WPA_PSK));
     } else {
         ESP_ERROR_CHECK(esp_mesh_set_ap_authmode(WIFI_AUTH_OPEN));
     }
@@ -518,7 +531,16 @@ mdf_err_t mwifi_start()
     ESP_ERROR_CHECK(esp_mesh_set_config(&mesh_config));
 
     /**< Start mesh network. */
-    return esp_mesh_start();
+    esp_err_t ret = esp_mesh_start();
+
+#ifdef CONFIG_MWIFI_ENABLE_PS
+    /* set the device active duty cycle. (default:10, MESH_PS_DEVICE_DUTY_REQUEST) */
+    ESP_ERROR_CHECK(esp_mesh_set_active_duty_cycle(CONFIG_MWIFI_PS_DEV_DUTY, CONFIG_MWIFI_PS_DEV_DUTY_TYPE));
+    /* set the network active duty cycle. (default:10, -1, MESH_PS_NETWORK_DUTY_APPLIED_ENTIRE) */
+    ESP_ERROR_CHECK(esp_mesh_set_network_duty_cycle(CONFIG_MWIFI_PS_NWK_DUTY, CONFIG_MWIFI_PS_NWK_DUTY_DURATION, CONFIG_MWIFI_PS_NWK_DUTY_RULE));
+#endif
+
+    return ret;
 }
 
 mdf_err_t mwifi_stop()

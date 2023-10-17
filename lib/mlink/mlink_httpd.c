@@ -243,7 +243,7 @@ static mdf_err_t mlink_get_mesh_info(httpd_req_t *req)
     char *tmp_ptr = routing_table_str;
 
     for (int i = 0; i < routing_table_size; i++) {
-        tmp_ptr += sprintf(tmp_ptr, "%s%2x%02x%02x%02x%02x%02x",
+        tmp_ptr += sprintf(tmp_ptr, "%s%02x%02x%02x%02x%02x%02x",
                            (i == 0) ? "" : ",", MAC2STR(routing_table[i].addr));
     }
 
@@ -587,7 +587,7 @@ static esp_err_t mlink_ota_firmware(httpd_req_t *req)
 EXIT:
 
     MDF_FREE(buf);
-    MDF_FREE(addrs_list)
+    MDF_FREE(addrs_list);
     MDF_FREE(httpd_hdr_value);
     return ret;
 }
@@ -718,7 +718,7 @@ EXIT:
     }
 
     MDF_FREE(buf);
-    MDF_FREE(addrs_list)
+    MDF_FREE(addrs_list);
     MDF_FREE(firmware_url);
     MDF_FREE(httpd_hdr_value);
     return ret;
